@@ -1,0 +1,12 @@
+[general]
+
+#### Logging
+log-level = "info"
+
+#### CORS & Security headers
+cors-allow-origins = "https://moa.local"
+
+
+#### Directory listing
+#directory-listing = true
+
