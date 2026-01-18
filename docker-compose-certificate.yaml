@@ -1,4 +1,4 @@
-name: cert
+name: hubs
 services:
   nginx:
     image: nginx:1.29-alpine
@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx-conf:/etc/nginx/conf.d
+      - ./nginx-conf-certificate:/etc/nginx/conf.d
       - ./single:/var/www/single:ro
       - ./support:/var/www/support:ro
       - acme-challenge:/var/www/acme-challenge:ro
@@ -16,7 +16,7 @@ services:
       - hubs
     environment:
       HUB_DOMAIN: ${HUB_DOMAIN:?error}
-    command: /bin/sh -c "envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/acme-challenge.conf.template > /etc/nginx/conf.d/acme-challenge.conf && exec nginx -g 'daemon off;'"
+    command: /bin/sh -c "envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/acme-challenge.template > /etc/nginx/conf.d/acme-challenge.conf && exec nginx -g 'daemon off;'"
     healthcheck:
       test: ['CMD', 'curl', 'http://127.0.0.1/healthz']
       interval: 15s
@@ -32,7 +32,7 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - acme-challenge:/var/www/acme-challenge
-    command: certonly --webroot --webroot-path=/var/www/acme-challenge --expand --email ${ADM_EMAIL:?error} --agree-tos --force-renewal --non-interactive -d ${HUB_DOMAIN:?error} -d support.${HUB_DOMAIN:?error}
+    command: certonly --webroot --webroot-path=/var/www/acme-challenge --expand --email ${ADM_EMAIL:?error} --agree-tos --force-renewal --non-interactive -d ${HUB_DOMAIN:?error} -d assets.${HUB_DOMAIN:?error} -d cors.${HUB_DOMAIN:?error} -d stream.${HUB_DOMAIN:?error} -d support.${HUB_DOMAIN:?error}
 
 
 volumes:

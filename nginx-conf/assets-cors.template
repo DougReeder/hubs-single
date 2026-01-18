@@ -1,0 +1,94 @@
+server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name assets.$HUB_DOMAIN cors.$HUB_DOMAIN;
+
+        location /healthz {
+            return 200 'ok';
+            access_log off;
+        }
+
+        location ~ /.well-known/acme-challenge {
+                allow all;
+                root /var/www/acme-challenge;
+        }
+
+# https://assets.single.hominidsoftware.com/hubs/assets/stylesheets/support-63d74e7f6dde478
+        location /hubs/ {
+            proxy_pass http://hubs:8080/;
+
+            proxy_set_header X-Forwarded-For "";
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+        }
+
+# https://assets.single.hominidsoftware.com/spoke/assets/js/entry-0bff1a698e3d55268289.js
+# https://assets.single.hominidsoftware.com/spoke/assets/images/favicon.ico
+        location /spoke/ {
+            proxy_pass http://spoke:8080/;
+
+            proxy_set_header X-Forwarded-For "";
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+        }
+
+# "proxy_pass" cannot have URI part in location given by regular expression
+#         location /files/ {
+#             proxy_pass http://ret:4001/;
+#
+#             proxy_set_header X-Forwarded-For "";
+#
+#             proxy_set_header Host $host;
+#             proxy_set_header X-Real-IP $remote_addr;
+#             proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#         }
+#
+#         location /http {
+#             proxy_pass http://ret:4001/;
+#
+#             proxy_set_header X-Forwarded-For "";
+#
+#             proxy_set_header Host $host;
+#             proxy_set_header X-Real-IP $remote_addr;
+#             proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#         }
+
+        location / {
+             return 502 'bad gateway';
+        }
+
+        server_tokens off;
+
+        ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
+
+        include /etc/nginx/conf.d/options-ssl-nginx.conf;
+
+#         add_header X-Frame-Options "SAMEORIGIN" always;
+#         add_header X-XSS-Protection "1; mode=block" always;
+#         add_header X-Content-Type-Options "nosniff" always;
+#         # add_header Referrer-Policy "no-referrer-when-downgrade" always;
+#         add_header Content-Security-Policy "default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'none'; frame-ancestors 'none'; form-action 'none';" always;
+#         # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+#         # enable strict transport security only if you understand the implications
+
+        location ~ /\.ht {
+                deny all;
+        }
+
+        location = /favicon.ico {
+                log_not_found off; access_log off;
+        }
+        location = /robots.txt {
+                log_not_found off; access_log off; allow all;
+        }
+        location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
+                expires max;
+                log_not_found off;
+        }
+}
