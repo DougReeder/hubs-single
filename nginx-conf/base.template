@@ -2,7 +2,7 @@ server {
         listen 443 ssl;
         listen [::]:443 ssl;
         http2 on;
-        server_name ${HUB_DOMAIN};
+        server_name $HUB_DOMAIN;
 
         location ~ /.well-known/acme-challenge {
                 allow all;
@@ -13,6 +13,19 @@ server {
             return 200 'ok';
             access_log off;
         }
+
+
+#         location / {
+#             proxy_pass http://ret:4001/;
+#
+#             proxy_set_header X-Forwarded-For "";
+#
+#             proxy_set_header Host $host;
+#             proxy_set_header X-Real-IP $remote_addr;
+#             proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#         }
+
+# https://hubs.hominidsoftware.com/spoke
 
         location / {
                 root /var/www/single;

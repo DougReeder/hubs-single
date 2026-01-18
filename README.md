@@ -10,9 +10,15 @@
 ## Setup
 
 1. Install a container runtime or Docker Desktop.
-2. Clone the [Hubs Single repository](https://github.com/Hubs-Foundation/hubs-single) from GitHub.
+2. In your terminal, clone the [Hubs Single repository](https://github.com/Hubs-Foundation/hubs-single) from GitHub.
+3. Change directory to the cloned repository.
+4. Copy `.env.example` to `.env` and edit the values.
+5. Run `docker compose -f docker-compose-certificate.yaml up`
+6. After the log shows `Successfully received certificate.`, type control-C to stop the servers
+
+[//]: # (7. run `docker compose -f docker-compose-init.yaml down`)
 
 
 ## Running
-1. Navigate to the repository directory in your terminal.
-2. Run `docker-compose up` to start the servers.
+1. In your terminal, navigate to the repository directory.
+2. Run `docker compose up` to start the servers.
