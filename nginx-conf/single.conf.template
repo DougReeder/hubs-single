@@ -2,7 +2,7 @@ server {
         listen 443 ssl;
         listen [::]:443 ssl;
         http2 on;
-        server_name single.hominidsoftware.com;
+        server_name ${HUB_DOMAIN};
 
         location ~ /.well-known/acme-challenge {
                 allow all;
@@ -22,8 +22,8 @@ server {
 
         server_tokens off;
 
-        ssl_certificate /etc/letsencrypt/live/single.hominidsoftware.com/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/single.hominidsoftware.com/privkey.pem;
+        ssl_certificate /etc/letsencrypt/live/${HUB_DOMAIN}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/${HUB_DOMAIN}/privkey.pem;
 
         include /etc/nginx/conf.d/options-ssl-nginx.conf;
 

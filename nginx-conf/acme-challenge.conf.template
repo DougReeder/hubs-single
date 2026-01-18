@@ -1,0 +1,23 @@
+server {
+        listen 80;
+        listen [::]:80;
+        server_name ${HUB_DOMAIN} support.${HUB_DOMAIN};
+
+        root /dev/null;
+
+        location ~ /.well-known/acme-challenge {
+                allow all;
+                root /var/www/acme-challenge;
+        }
+
+        location /healthz {
+            return 200 'ok';
+            access_log off;
+        }
+
+        location / {
+            return 502 'bad gateway';
+#                 return 301 https://$host$request_uri;
+#                 rewrite ^ https://$host$request_uri? permanent;
+        }
+}

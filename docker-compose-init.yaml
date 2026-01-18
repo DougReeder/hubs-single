@@ -1,23 +1,22 @@
 name: cert
 services:
-
   nginx:
-#    depends_on:
-#      - wordpress
     image: nginx:1.29-alpine
     container_name: nginx
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      - ./nginx-conf:/etc/nginx/conf.d:ro
+      - ./nginx-conf:/etc/nginx/conf.d
       - ./single:/var/www/single:ro
       - ./support:/var/www/support:ro
       - acme-challenge:/var/www/acme-challenge:ro
       - certbot-etc:/etc/letsencrypt:ro
     networks:
       - hubs
+    environment:
+      HUB_DOMAIN: ${HUB_DOMAIN:?error}
+    command: /bin/sh -c "envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/acme-challenge.conf.template > /etc/nginx/conf.d/acme-challenge.conf && exec nginx -g 'daemon off;'"
     healthcheck:
       test: ['CMD', 'curl', 'http://127.0.0.1/healthz']
       interval: 15s
@@ -33,7 +32,7 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - acme-challenge:/var/www/acme-challenge
-    command: certonly --webroot --webroot-path=/var/www/acme-challenge --expand --email hominidsoftware@gmail.com --agree-tos --force-renewal --non-interactive -d ${HUB_DOMAIN:?error} -d support.${HUB_DOMAIN:?error}
+    command: certonly --webroot --webroot-path=/var/www/acme-challenge --expand --email ${ADM_EMAIL:?error} --agree-tos --force-renewal --non-interactive -d ${HUB_DOMAIN:?error} -d support.${HUB_DOMAIN:?error}
 
 
 volumes:

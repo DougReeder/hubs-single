@@ -1,7 +1,7 @@
 server {
         listen 80;
         listen [::]:80;
-        server_name single.hominidsoftware.com support.single.hominidsoftware.com;
+        server_name ${HUB_DOMAIN} support.${HUB_DOMAIN};
 
         root /dev/null;
 
@@ -17,6 +17,7 @@ server {
 
         location / {
             return 502 'bad gateway';
+#                 return 301 https://$host$request_uri;
 #                 rewrite ^ https://$host$request_uri? permanent;
         }
 }
