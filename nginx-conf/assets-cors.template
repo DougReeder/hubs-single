@@ -18,7 +18,7 @@ server {
         location /hubs/ {
             proxy_pass http://hubs:8080/;
 
-            include /etc/nginx/conf.d/proxy-headers.conf;
+            include /etc/nginx/conf.d/proxy-headers.inc;
         }
 
 # https://assets.single.hominidsoftware.com/spoke/assets/js/entry-0bff1a698e3d55268289.js
@@ -26,20 +26,22 @@ server {
         location /spoke/ {
             proxy_pass http://spoke:8080/;
 
-            include /etc/nginx/conf.d/proxy-headers.conf;
+            include /etc/nginx/conf.d/proxy-headers.inc;
         }
 
 # "proxy_pass" cannot have URI part in location given by regular expression
 #         location /files/ {
 #             proxy_pass http://ret:4001/;
 #
-#            include /etc/nginx/conf.d/proxy-headers.conf;
+#            include /etc/nginx/conf.d/proxy-headers.inc;
+##            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
 #         }
 #
 #         location /http {
 #             proxy_pass http://ret:4001/;
 #
-#            include /etc/nginx/conf.d/proxy-headers.conf;
+#            include /etc/nginx/conf.d/proxy-headers.inc;
+##            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
 #         }
 
 #         # only stream needs this, but it should be ok
@@ -57,7 +59,8 @@ server {
         ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
 
-        include /etc/nginx/conf.d/options-ssl-nginx.conf;
+        include /etc/nginx/conf.d/options-ssl-nginx.inc;
+        include /etc/nginx/conf.d/security.inc;
 
 #         add_header X-Frame-Options "SAMEORIGIN" always;
 #         add_header X-XSS-Protection "1; mode=block" always;
@@ -66,19 +69,4 @@ server {
 #         add_header Content-Security-Policy "default-src 'none'; script-src 'none'; connect-src 'none'; img-src 'none'; style-src 'none'; frame-ancestors 'none'; form-action 'none';" always;
 #         # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 #         # enable strict transport security only if you understand the implications
-
-        location ~ /\.ht {
-                deny all;
-        }
-
-        location = /favicon.ico {
-                log_not_found off; access_log off;
-        }
-        location = /robots.txt {
-                log_not_found off; access_log off; allow all;
-        }
-        location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
-                expires max;
-                log_not_found off;
-        }
 }

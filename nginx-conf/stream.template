@@ -22,7 +22,7 @@ server {
 #             proxy_buffering off;
 ## haproxy.org/load-balance: "url_param roomId"
 #
-#            include /etc/nginx/conf.d/proxy-headers.conf;
+#            include /etc/nginx/conf.d/proxy-headers.inc;
         }
 
         server_tokens off;
@@ -30,5 +30,6 @@ server {
         ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
 
-        include /etc/nginx/conf.d/options-ssl-nginx.conf;
+        include /etc/nginx/conf.d/options-ssl-nginx.inc;
+        include /etc/nginx/conf.d/security.inc;
 }
