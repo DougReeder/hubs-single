@@ -1,0 +1,34 @@
+server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name stream.$HUB_DOMAIN;
+
+        location /healthz {
+            return 200 'ok';
+            access_log off;
+        }
+
+        location ~ /.well-known/acme-challenge {
+                allow all;
+                root /var/www/acme-challenge;
+        }
+
+# https://assets.single.hominidsoftware.com/hubs/assets/stylesheets/support-63d74e7f6dde478
+        location / {
+            return 501 'under construction';
+
+#             proxy_pass http://dialog:4443/;
+#             proxy_buffering off;
+## haproxy.org/load-balance: "url_param roomId"
+#
+#            include /etc/nginx/conf.d/proxy-headers.conf;
+        }
+
+        server_tokens off;
+
+        ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
+
+        include /etc/nginx/conf.d/options-ssl-nginx.conf;
+}
