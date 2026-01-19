@@ -47,8 +47,8 @@ services:
       - postgresql-data:/var/lib/postgresql/data
     networks:
       - hubs
-    ports:
-      - '5432:5432'   # development only
+#    ports:
+#      - '127.0.0.1:5432:5432'   # development only
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASS:-123456}
@@ -64,9 +64,9 @@ services:
     restart: unless-stopped
     networks:
       - hubs
-    ports:
-      - '5433:5432'   # development only
-#      - '6432:6432'   # development only
+#    ports:
+#      - '127.0.0.1:5433:5432'   # development only
+##      - '127.0.0.1:6432:6432'   # development only
     environment: &pgbouncer-environment
       MAX_CLIENT_CONN: '10000'
       DB_USER: ${DB_USER:-postgres}
@@ -84,9 +84,9 @@ services:
     restart: unless-stopped
     networks:
       - hubs
-    ports:
-      - '5434:5432'   # development only
-#      - '6432:6432'   # development only
+#    ports:
+#      - '127.0.0.1:5434:5432'   # development only
+##      - '127.0.0.1:6432:6432'   # development only
     environment:
       <<: *pgbouncer-environment
       POOL_MODE: transaction
@@ -102,7 +102,7 @@ services:
       - hubs
     #    network_mode: service:reticulum
     ports:
-      - '3000:3000'
+      - '127.0.0.1:3000:3000'
     environment:
       PGRST_LOG_LEVEL: info
       PGRST_DB_SCHEMA: ret0_admin
@@ -127,7 +127,7 @@ services:
     ports:
       - '4000:4000'   # HTTPS (development only)
       - '4001:4001'   # HTTP (development only)
-      - '9100:9100'
+      - '127.0.0.1:9100:9100'
     volumes:
       - reticulum-storage:/storage
       - ./reticulum-config:/home/ret
@@ -170,8 +170,8 @@ services:
       ret: { condition: service_healthy }
 #      dialog: { condition: service_healthy, required: false }
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx-conf:/etc/nginx/conf.d
       - ./single:/var/www/single:ro
@@ -226,7 +226,7 @@ services:
 #      - hubs
 #    ports:
 #      - '4443:4443'
-#      - '7000:7000'
+#      - '127.0.0.1:7000:7000'
 #      - '40000-40050:40000-40050'
 #      - '40000-40050:40000-40050/udp'
 #    healthcheck:   # Mediasoup 5 has a built-in healthcheck
@@ -246,7 +246,7 @@ services:
 #      REALM: turkey
 #      PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@pgbouncer/${DB_NAME:-retdb}'
 #    healthcheck:
-#      test: ["CMD", "nc", "-zv", "coturn", "5349"]
+#      test: ['CMD', 'nc', '-zv', 'coturn', '5349']
 
 
 volumes:

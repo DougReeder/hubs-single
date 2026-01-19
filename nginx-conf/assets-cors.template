@@ -14,58 +14,53 @@ server {
                 root /var/www/acme-challenge;
         }
 
-        # It might be best to let the catchall block handle this.
-        location /api-internal {
-          return 404 'not found';
-        }
-
 # https://assets.single.hominidsoftware.com/hubs/assets/stylesheets/support-63d74e7f6dde478
         location /hubs {
-            proxy_pass https://hubs:8080/;
+            proxy_pass https://hubs:8080;   # TLS
 
-            include /etc/nginx/conf.d/proxy-headers.inc;
+            include /etc/nginx/conf.d/proxy-directives.inc;
             add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/security.inc;
         }
 
 # https://assets.single.hominidsoftware.com/spoke/assets/js/entry-0bff1a698e3d55268289.js
 # https://assets.single.hominidsoftware.com/spoke/assets/images/favicon.ico
         location /spoke {
-            proxy_pass https://spoke:8080/;
+            proxy_pass https://spoke:8080;   # TLS
 
-            include /etc/nginx/conf.d/proxy-headers.inc;
+            include /etc/nginx/conf.d/proxy-directives.inc;
             add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/security.inc;
         }
 
 # "proxy_pass" cannot have URI part in location given by regular expression
         location /files/ {
-            proxy_pass http://ret:4001/;   # HTTP
+            proxy_pass http://ret:4001;   # no TLS
 
-           include /etc/nginx/conf.d/proxy-headers.inc;
-           add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/proxy-directives.inc;
+            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
         }
 
         location /http {
-            proxy_pass http://ret:4001/;   # HTTP
+            proxy_pass http://ret:4001;   # no TLS
 
-           include /etc/nginx/conf.d/proxy-headers.inc;
-           add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/proxy-directives.inc;
+            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
         }
 
 #         # only stream (not cors) needs this, but it should be ok
-#         location /nearspark {
-#             proxy_pass http://nearspark:5000/;
-#             rewrite ^/nearspark/(.*)$ /$1 break;
+#         location /nearspark/ {
+#             proxy_pass http://nearspark:5000/;   # TLS
+##             proxy_pass http://nearspark:5000;   # TLS
+##             rewrite ^/nearspark/(.*)$ /$1 break;
 #         }
 
         location / {
              return 502 'bad gateway';
-        }
-
-        server_tokens off;
+#            return 404 'not found';
+       }
 
         ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
-
         include /etc/nginx/conf.d/options-ssl-nginx.inc;
-        include /etc/nginx/conf.d/security.inc;
 }

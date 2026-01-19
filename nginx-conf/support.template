@@ -20,12 +20,10 @@ server {
                 try_files $uri $uri/ $uri.html =404;
         }
 
-        server_tokens off;
-
         ssl_certificate     /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
-
         include /etc/nginx/conf.d/options-ssl-nginx.inc;
+
         include /etc/nginx/conf.d/security.inc;
 
         location ~ /\.ht {
