@@ -39,127 +39,127 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-fk', 'https://spoke:8080/healthz']
 
-#  pgsql:
-#    container_name: pgsql
-#    image: ${OVERRIDE_POSTGRES_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/postgres:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    volumes:
-#      - postgresql-data:/var/lib/postgresql/data
-#    networks:
-#      - hubs
-#    ports:
-#      - '5432:5432'   # development only
-#    environment:
-#      POSTGRES_USER: ${DB_USER:-postgres}
-#      POSTGRES_PASSWORD: ${DB_PASS:-123456}
-#      POSTGRES_DB: ${DB_NAME:-retdb}
-#    healthcheck:
-#      test: ['CMD', 'pg_isready', '-U', '${DB_USER:-postgres}', '-d', '${DB_NAME:-retdb}']
-#
-#  pgbouncer:
-#    container_name: pgbouncer
-#    image: ${OVERRIDE_PGBOUNCER_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/pgbouncer:${CONTAINER_TAG:-stable-latest}}
-#    depends_on:
-#      pgsql: { condition: service_healthy, restart: true }
-#    restart: unless-stopped
-#    networks:
-#      - hubs
-#    ports:
-#      - '5433:5432'   # development only
-##      - '6432:6432'   # development only
-#    environment: &pgbouncer-environment
-#      MAX_CLIENT_CONN: '10000'
-#      DB_USER: ${DB_USER:-postgres}
-#      DB_PASSWORD: ${DB_PASS:-123456}
-#      PGPASSWORD:  ${DB_PASS:-123456}
-#      DB_HOST: pgsql
-#    healthcheck: &pgbouncer-healthcheck
-#      test: ['CMD', 'psql', '-h', 'localhost', '-U', '${DB_USER:-postgres}', '-c', 'SELECT 1']
-#
-#  pgbouncer-t:
-#    container_name: pgbouncer-t
-#    image: ${OVERRIDE_PGBOUNCER_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/pgbouncer:${CONTAINER_TAG:-stable-latest}}
-#    depends_on:
-#      pgsql: { condition: service_healthy, restart: true }
-#    restart: unless-stopped
-#    networks:
-#      - hubs
-#    ports:
-#      - '5434:5432'   # development only
-##      - '6432:6432'   # development only
-#    environment:
-#      <<: *pgbouncer-environment
-#      POOL_MODE: transaction
-#    healthcheck: *pgbouncer-healthcheck
-#
-#  postgrest:
-#    container_name: postgrest
-#    image: ${OVERRIDE_POSTGREST_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/postgrest:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    depends_on:
-#      pgbouncer: { condition: service_healthy }
-#      pgbouncer-t: { condition: service_healthy }
-#    networks:
-#      - hubs
-#    #    network_mode: service:reticulum
-#    ports:
-#      - '3000:3000'
-#    environment:
-#      PGRST_LOG_LEVEL: info
-#      PGRST_DB_SCHEMA: ret0_admin
-#      PGRST_DB_ANON_ROLE: ${DB_USER:-postgres}
-#      PGRST_DB_URI: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@pgbouncer/${DB_NAME:-retdb}'
-#  #    healthcheck:
-#  #      test: ['CMD', 'postgrest', '--ready']   # when updated to post-2025-09-28
-#
-#  ret:
-#    container_name: ret
-#    image: ${OVERRIDE_RETICULUM_IMAGE:-hubsfoundation/reticulum:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    privileged: true
-#    depends_on:
-#      hubs: { condition: service_healthy }
+  pgsql:
+    container_name: pgsql
+    image: ${OVERRIDE_POSTGRES_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/postgres:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    networks:
+      - hubs
+    ports:
+      - '5432:5432'   # development only
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-123456}
+      POSTGRES_DB: ${DB_NAME:-retdb}
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', '${DB_USER:-postgres}', '-d', '${DB_NAME:-retdb}']
+
+  pgbouncer:
+    container_name: pgbouncer
+    image: ${OVERRIDE_PGBOUNCER_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/pgbouncer:${CONTAINER_TAG:-stable-latest}}
+    depends_on:
+      pgsql: { condition: service_healthy, restart: true }
+    restart: unless-stopped
+    networks:
+      - hubs
+    ports:
+      - '5433:5432'   # development only
+#      - '6432:6432'   # development only
+    environment: &pgbouncer-environment
+      MAX_CLIENT_CONN: '10000'
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASS:-123456}
+      PGPASSWORD:  ${DB_PASS:-123456}
+      DB_HOST: pgsql
+    healthcheck: &pgbouncer-healthcheck
+      test: ['CMD', 'psql', '-h', 'localhost', '-U', '${DB_USER:-postgres}', '-c', 'SELECT 1']
+
+  pgbouncer-t:
+    container_name: pgbouncer-t
+    image: ${OVERRIDE_PGBOUNCER_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/pgbouncer:${CONTAINER_TAG:-stable-latest}}
+    depends_on:
+      pgsql: { condition: service_healthy, restart: true }
+    restart: unless-stopped
+    networks:
+      - hubs
+    ports:
+      - '5434:5432'   # development only
+#      - '6432:6432'   # development only
+    environment:
+      <<: *pgbouncer-environment
+      POOL_MODE: transaction
+    healthcheck: *pgbouncer-healthcheck
+
+  postgrest:
+    container_name: postgrest
+    image: ${OVERRIDE_POSTGREST_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/postgrest:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    depends_on:
+      pgbouncer: { condition: service_healthy, restart: true }
+    networks:
+      - hubs
+    #    network_mode: service:reticulum
+    ports:
+      - '3000:3000'
+    environment:
+      PGRST_LOG_LEVEL: info
+      PGRST_DB_SCHEMA: ret0_admin
+      PGRST_DB_ANON_ROLE: ${DB_USER:-postgres}
+      PGRST_DB_URI: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@pgbouncer/${DB_NAME:-retdb}'
+  #    healthcheck:
+  #      test: ['CMD', 'postgrest', '--ready']   # when updated to post-2025-09-28
+
+  ret:
+    container_name: ret
+    image: ${OVERRIDE_RETICULUM_IMAGE:-hubsfoundation/reticulum:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    privileged: true
+    depends_on:
+      hubs: { condition: service_healthy }
 #      spoke: { condition: service_healthy, required: false }
-#      pgbouncer: { condition: service_healthy }
-#      pgbouncer-t: { condition: service_healthy }
-#    networks:
-#      - hubs
-#    ports:
-#      - '4000:4000'
-#      - '4001:4001'
-#      - '9100:9100'
-#    volumes:
-#      - reticulum-storage:/storage
-#      - ./reticulum-config:/home/ret
-#    environment:
-#      POD_IP: reticulum
-#      POD_NAME: reticulum
-#      turkeyCfg_POD_NS: hcce   # only for substitution in config.toml.template?
-#      turkeyCfg_NODE_COOKIE: ${NODE_COOKIE:?error}
-#      turkeyCfg_HUB_DOMAIN: ${HUB_DOMAIN:?error}
-#      turkeyCfg_DOMAIN: ${HUB_DOMAIN:?error}
-#      turkeyCfg_DB_USER: ${DB_USER:-postgres}
-#      turkeyCfg_DB_PASS: ${DB_PASS:-123456}
-#      turkeyCfg_DB_NAME: ${DB_NAME:-retdb}
-#      turkeyCfg_DB_HOST: ${DB_HOST:-pgbouncer}
-#      turkeyCfg_DB_HOST_T: ${DB_HOST_T:-pgbouncer-t}
-#      turkeyCfg_GUARDIAN_KEY: ${GUARDIAN_KEY:?error}
-#      turkeyCfg_PHX_KEY: ${PHX_KEY:?error}
-#      turkeyCfg_SMTP_SERVER: ${SMTP_SERVER:?error}
-#      turkeyCfg_SMTP_PORT: ${SMTP_PORT:?error}
-#      turkeyCfg_SMTP_USER: ${SMTP_USER:?error}
-#      turkeyCfg_SMTP_PASS: ${SMTP_PASS:?error}
-#      turkeyCfg_ADM_EMAIL: ${ADM_EMAIL:?error}
-#      turkeyCfg_SKETCHFAB_API_KEY: ${SKETCHFAB_API_KEY:-}
-#      turkeyCfg_IMG_PROXY: nearspark
-#      turkeyCfg_TENOR_API_KEY: ${TENOR_API_KEY:-}
-#      turkeyCfg_YTDL_HOST: http://ytdl:5000
-#      turkeyCfg_PHOTOMNEMONIC: http://photomnemonic:5000
-#      turkeyCfg_SPEELYCAPTOR: http://speelycaptor:5000
-#      turkeyCfg_STORAGE_QUOTA_GB: 1000
-#    healthcheck:
-#      test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
-#
+      pgbouncer: { condition: service_healthy }
+      pgbouncer-t: { condition: service_healthy }
+      postgrest: { condition: service_started }
+    networks:
+      - hubs
+    ports:
+      - '4000:4000'   # HTTPS (development only)
+      - '4001:4001'   # HTTP (development only)
+      - '9100:9100'
+    volumes:
+      - reticulum-storage:/storage
+      - ./reticulum-config:/home/ret
+    environment:
+      POD_IP: reticulum
+      POD_NAME: reticulum
+      turkeyCfg_POD_NS: hcce   # only for substitution in config.toml.template?
+      turkeyCfg_NODE_COOKIE: ${NODE_COOKIE:?error}
+      turkeyCfg_HUB_DOMAIN: ${HUB_DOMAIN:?error}
+      turkeyCfg_DOMAIN: ${HUB_DOMAIN:?error}
+      turkeyCfg_DB_USER: ${DB_USER:-postgres}
+      turkeyCfg_DB_PASS: ${DB_PASS:-123456}
+      turkeyCfg_DB_NAME: ${DB_NAME:-retdb}
+      turkeyCfg_DB_HOST: ${DB_HOST:-pgbouncer}
+      turkeyCfg_DB_HOST_T: ${DB_HOST_T:-pgbouncer-t}
+      turkeyCfg_GUARDIAN_KEY: ${GUARDIAN_KEY:?error}
+      turkeyCfg_PHX_KEY: ${PHX_KEY:?error}
+      turkeyCfg_SMTP_SERVER: ${SMTP_SERVER:?error}
+      turkeyCfg_SMTP_PORT: ${SMTP_PORT:?error}
+      turkeyCfg_SMTP_USER: ${SMTP_USER:?error}
+      turkeyCfg_SMTP_PASS: ${SMTP_PASS:?error}
+      turkeyCfg_ADM_EMAIL: ${ADM_EMAIL:?error}
+      turkeyCfg_SKETCHFAB_API_KEY: ${SKETCHFAB_API_KEY:-}
+      turkeyCfg_IMG_PROXY: nearspark
+      turkeyCfg_TENOR_API_KEY: ${TENOR_API_KEY:-}
+      turkeyCfg_YTDL_HOST: http://ytdl:5000
+      turkeyCfg_PHOTOMNEMONIC: http://photomnemonic:5000
+      turkeyCfg_SPEELYCAPTOR: http://speelycaptor:5000
+      turkeyCfg_STORAGE_QUOTA_GB: 1000
+    healthcheck:
+      test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
+
   nginx:
     image: nginx:1.29-alpine
     container_name: nginx
@@ -167,7 +167,7 @@ services:
     depends_on:
       hubs: { condition: service_healthy }
       spoke: { condition: service_healthy, required: false }
-#      ret: { condition: service_healthy }
+      ret: { condition: service_healthy }
 #      dialog: { condition: service_healthy, required: false }
     ports:
       - "80:80"
@@ -187,13 +187,6 @@ services:
       for file in /etc/nginx/conf.d/*.template; do
         envsubst '$$HUB_DOMAIN' < $$file > $${file%.template}.conf;
       done && exec nginx -g 'daemon off;'"
-    #    command: |
-    #      /bin/sh -c "
-    #      envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/acme-challenge.conf.template > /etc/nginx/conf.d/acme-challenge.conf
-    #      && envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/single.conf.template > /etc/nginx/conf.d/single.conf
-    #      && envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/assets-cors.conf.template > /etc/nginx/conf.d/assets-cors.conf
-    #      && envsubst '$$HUB_DOMAIN' < /etc/nginx/conf.d/support.conf.template > /etc/nginx/conf.d/support.conf
-    #      && exec nginx -g 'daemon off;'"
     healthcheck:
       test: ['CMD', 'curl', 'http://127.0.0.1/healthz']
       interval: 15s
