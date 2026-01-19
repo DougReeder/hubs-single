@@ -18,11 +18,7 @@ server {
         location /hubs/ {
             proxy_pass http://hubs:8080/;
 
-            proxy_set_header X-Forwarded-For "";
-
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/proxy-headers.conf;
         }
 
 # https://assets.single.hominidsoftware.com/spoke/assets/js/entry-0bff1a698e3d55268289.js
@@ -30,32 +26,26 @@ server {
         location /spoke/ {
             proxy_pass http://spoke:8080/;
 
-            proxy_set_header X-Forwarded-For "";
-
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/proxy-headers.conf;
         }
 
 # "proxy_pass" cannot have URI part in location given by regular expression
 #         location /files/ {
 #             proxy_pass http://ret:4001/;
 #
-#             proxy_set_header X-Forwarded-For "";
-#
-#             proxy_set_header Host $host;
-#             proxy_set_header X-Real-IP $remote_addr;
-#             proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#            include /etc/nginx/conf.d/proxy-headers.conf;
 #         }
 #
 #         location /http {
 #             proxy_pass http://ret:4001/;
 #
-#             proxy_set_header X-Forwarded-For "";
-#
-#             proxy_set_header Host $host;
-#             proxy_set_header X-Real-IP $remote_addr;
-#             proxy_set_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#            include /etc/nginx/conf.d/proxy-headers.conf;
+#         }
+
+#         # only stream needs this, but it should be ok
+#         location /nearspark/ {
+#             proxy_pass http://nearspark:5000/;
+#             rewrite ^/nearspark/(.*)$ /$1 break;
 #         }
 
         location / {
