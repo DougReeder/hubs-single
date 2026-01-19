@@ -14,25 +14,32 @@ server {
             access_log off;
         }
 
+        location /api-internal {
+            allow 127.0.0.1;
+            allow 10.0.0.0/8;
+            allow 172.16.0.0/12;
+            allow 192.168.0.0/16;
+            deny all;
 
-#         location / {
-#             proxy_pass http://ret:4001/;
-#
-#            include /etc/nginx/conf.d/proxy-headers.inc;
-#         }
+            proxy_pass http://ret:4001;   # HTTP
+            include /etc/nginx/conf.d/proxy-headers.inc;
+        }
+
+        location / {
+            proxy_pass http://ret:4001/;   # HTTP
+
+           include /etc/nginx/conf.d/proxy-headers.inc;
+           add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+        }
 
 # https://hubs.hominidsoftware.com/spoke
 
-        location / {
-                root /var/www/single;
-                index index.html index.htm index.txt;
-                try_files $uri $uri/ $uri.html =404;
-        }
+# haproxy.org/path-rewrite: /api-internal(.*) /_drop_
 
         server_tokens off;
 
-        ssl_certificate /etc/letsencrypt/live/${HUB_DOMAIN}/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/${HUB_DOMAIN}/privkey.pem;
+        ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
 
         include /etc/nginx/conf.d/options-ssl-nginx.inc;
         include /etc/nginx/conf.d/security.inc;

@@ -18,7 +18,7 @@ server {
         location / {
             return 501 'under construction';
 
-#             proxy_pass http://dialog:4443/;
+#             proxy_pass https://dialog:4443/;
 #             proxy_buffering off;
 ## haproxy.org/load-balance: "url_param roomId"
 #
