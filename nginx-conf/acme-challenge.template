@@ -16,9 +16,6 @@ server {
         }
 
         location / {
-            return 402 'silly hacker';
-#             return 502 'bad gateway';
-#             return 301 https://$host$request_uri;
-#             rewrite ^ https://$host$request_uri? permanent;
+            return 308 https://$host$request_uri;
         }
 }

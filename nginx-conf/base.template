@@ -21,41 +21,22 @@ server {
             allow 192.168.0.0/16;
             deny all;
 
-            proxy_pass http://ret:4001;   # HTTP
-            include /etc/nginx/conf.d/proxy-headers.inc;
+            proxy_pass http://ret:4001;   # no TLS
+            include /etc/nginx/conf.d/proxy-directives.inc;
         }
+
+# https://single.hominidsoftware.com/api/v1/meta
+# https://single.hominidsoftware.com/spoke
 
         location / {
-            proxy_pass http://ret:4001/;   # HTTP
+            proxy_pass http://ret:4001;   # no TLS
 
-           include /etc/nginx/conf.d/proxy-headers.inc;
-           add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+            include /etc/nginx/conf.d/proxy-directives.inc;
+            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
+#             include /etc/nginx/conf.d/security.inc;
         }
-
-# https://hubs.hominidsoftware.com/spoke
-
-# haproxy.org/path-rewrite: /api-internal(.*) /_drop_
-
-        server_tokens off;
 
         ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/$HUB_DOMAIN/privkey.pem;
-
         include /etc/nginx/conf.d/options-ssl-nginx.inc;
-        include /etc/nginx/conf.d/security.inc;
-
-        location ~ /\.ht {
-                deny all;
-        }
-
-        location = /favicon.ico {
-                log_not_found off; access_log off;
-        }
-        location = /robots.txt {
-                log_not_found off; access_log off; allow all;
-        }
-        location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
-                expires max;
-                log_not_found off;
-        }
 }
