@@ -48,12 +48,11 @@ server {
             add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
         }
 
-#         # only stream (not cors) needs this, but it should be ok
-#         location /nearspark/ {
-#             proxy_pass http://nearspark:5000/;   # TLS
-##             proxy_pass http://nearspark:5000;   # TLS
-##             rewrite ^/nearspark/(.*)$ /$1 break;
-#         }
+# https://cors.single.hominidsoftware.com/nearspark/thumbnail/aHR0cHM6Ly9tZWRpYS5za2V0Y2hmYWIuY29tL21vZGVscy82ZTYxNzhiMDdhNTk0Mzg1YTYwNDUyZjdjMTMxOTQ5My90aHVtYm5haWxzLzczYmQyOGI0YWZmNDQ2NDY5ZDM5ZWUwNzcxNmQ5ZGFkL2I0NzY0NTkxOWEyNzQ4YzZiODc3MWVjNDRlMjU2YWUwLmpwZWc.jpeg?w=391&h=220
+        # only cors (not assets) needs this, but it should be ok
+        location /nearspark/ {
+            proxy_pass http://nearspark:5000/;   # TLS
+        }
 
         location / {
              return 502 'bad gateway';

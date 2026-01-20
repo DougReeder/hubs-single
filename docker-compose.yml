@@ -194,18 +194,18 @@ services:
       retries: 3
       start_period: 10s
 
-#  nearspark:
-#    container_name: nearspark
-#    image: ${OVERRIDE_NEARSPARK_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/nearspark:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    networks:
-#      - hubs
-#    ports:
-#      - '5000:5000'
-#    healthcheck:
-#      test: ['CMD', 'nc', '-zv', 'nearspark', '5000']
-##      test: ['CMD', 'wget', '-qO', '-', '-S', 'nearspark:5000/thumbnail/']
-#
+  nearspark:
+    container_name: nearspark
+    image: ${OVERRIDE_NEARSPARK_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/nearspark:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    networks:
+      - hubs
+    ports:
+      - '5000:5000'
+    healthcheck:
+      test: ['CMD', 'nc', '-zv', 'nearspark', '5000']
+#      test: ['CMD', 'wget', '-qO', '-', '-S', 'nearspark:5000/thumbnail/']
+
 #  photomnemonic:
 #    container_name: photomnemonic
 #    image: ${OVERRIDE_PHOTOMNEMONIC_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/photomnemonic:${CONTAINER_TAG:-stable-latest}}
