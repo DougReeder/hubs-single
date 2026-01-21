@@ -160,6 +160,27 @@ services:
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
 
+  dialog:
+    container_name: dialog
+    image: ${OVERRIDE_DIALOG_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/dialog:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    volumes:
+      - certbot-etc:/etc/letsencrypt:ro
+    #    network_mode: host
+    networks:
+      - hubs
+    ports:
+      - '4443:4443'
+      - '127.0.0.1:7000:7000'
+      - '40000-40050:40000-40050'
+      - '40000-40050:40000-40050/udp'
+    environment:
+      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/fullchain.pem
+      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/privkey.pem
+    healthcheck:   # Mediasoup 5 has a built-in healthcheck
+      #      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
+      test: ['CMD', 'curl', '-f', 'http://dialog:7000/meta']
+
   nginx:
     image: nginx:1.29-alpine
     container_name: nginx
@@ -168,10 +189,11 @@ services:
       hubs: { condition: service_healthy }
       spoke: { condition: service_healthy, required: false }
       ret: { condition: service_healthy }
-#      dialog: { condition: service_healthy, required: false }
+      dialog: { condition: service_healthy, required: false }
     ports:
       - '80:80'
       - '443:443'
+      - '4443:4443'
     volumes:
       - ./nginx-conf:/etc/nginx/conf.d
       - ./single:/var/www/single:ro
@@ -216,23 +238,7 @@ services:
 #      - '5001:5000'
 #    healthcheck:
 #      test: ['CMD', 'curl', '-f', 'http://photomnemonic:5000/_healthz']
-#
-#  dialog:
-#    container_name: dialog
-#    image: ${OVERRIDE_DIALOG_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/dialog:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    #    network_mode: host
-#    networks:
-#      - hubs
-#    ports:
-#      - '4443:4443'
-#      - '127.0.0.1:7000:7000'
-#      - '40000-40050:40000-40050'
-#      - '40000-40050:40000-40050/udp'
-#    healthcheck:   # Mediasoup 5 has a built-in healthcheck
-##      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
-#      test: ['CMD', 'curl', '-f', 'http://dialog:7000/meta']
-#
+
 #  coturn:
 #    container_name: coturn
 #    image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
