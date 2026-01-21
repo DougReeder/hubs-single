@@ -1,6 +1,6 @@
 server {
-        listen 443 ssl;
-        listen [::]:443 ssl;
+        listen 4443 ssl;
+        listen [::]:4443 ssl;
         http2 on;
         server_name stream.$HUB_DOMAIN;
 
@@ -14,15 +14,12 @@ server {
                 root /var/www/acme-challenge;
         }
 
-# https://assets.single.hominidsoftware.com/hubs/assets/stylesheets/support-63d74e7f6dde478
         location / {
-            return 501 'under construction';
+            proxy_pass https://dialog:4443;   # TLS
+            proxy_buffering off;
+# haproxy.org/load-balance: "url_param roomId"
 
-#             proxy_pass https://dialog:4443;   # TLS
-#             proxy_buffering off;
-## haproxy.org/load-balance: "url_param roomId"
-#
-#            include /etc/nginx/conf.d/proxy-directives.inc;
+            include /etc/nginx/conf.d/proxy-directives.inc;
         }
 
         ssl_certificate /etc/letsencrypt/live/$HUB_DOMAIN/fullchain.pem;
