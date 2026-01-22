@@ -245,16 +245,18 @@ services:
     container_name: coturn
     image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
     restart: unless-stopped
+    volumes:
+      - certbot-etc:/etc/letsencrypt:ro
     network_mode: host   # HCCE uses hostNetwork: true
 #    extra_hosts:
-#      - host.docker.internal:host-gateway
-#    networks:
-#      - hubs
-#    ports:
-#      - '5349:5349'
+#      - host.docker.internal=host-gateway   # could use this to set external-ip
     environment:
       REALM: turkey
       PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@localhost/${DB_NAME:-retdb}'
+      COTURN_MIN_PORT: ${COTURN_MIN_PORT:-49152}
+      COTURN_MAX_PORT: ${COTURN_MAX_PORT:-51609}
+      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/fullchain.pem
+      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/privkey.pem
     healthcheck:
       test: ['CMD', 'nc', '-zv', '${HUB_DOMAIN:?error}', '5349']
 
