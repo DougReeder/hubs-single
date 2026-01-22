@@ -64,8 +64,9 @@ services:
     restart: unless-stopped
     networks:
       - hubs
-#    ports:
-#      - '127.0.0.1:5433:5432'   # development only
+    ports:
+      - '127.0.0.1:5432:5432'   # pgbouncer on hubs network; 127.0.0.1 on host
+      - '[::1]:5432:5432'
 ##      - '127.0.0.1:6432:6432'   # development only
     environment: &pgbouncer-environment
       MAX_CLIENT_CONN: '10000'
@@ -166,7 +167,7 @@ services:
     restart: unless-stopped
     volumes:
       - certbot-etc:/etc/letsencrypt:ro
-    #    network_mode: host
+#    network_mode: host   # HCCE uses hostNetwork: true
     networks:
       - hubs
     ports:
@@ -240,20 +241,22 @@ services:
       test: ['CMD', 'curl', '-f', 'http://photomnemonic:5000/_healthz']
 # curl http://photomnemonic:5000/screenshot/?url=https://example.com/ > /tmp/screenshot1.png
 
-#  coturn:
-#    container_name: coturn
-#    image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-##    network_mode: host
+  coturn:
+    container_name: coturn
+    image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    network_mode: host   # HCCE uses hostNetwork: true
+#    extra_hosts:
+#      - host.docker.internal:host-gateway
 #    networks:
 #      - hubs
 #    ports:
 #      - '5349:5349'
-#    environment:
-#      REALM: turkey
-#      PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@pgbouncer/${DB_NAME:-retdb}'
-#    healthcheck:
-#      test: ['CMD', 'nc', '-zv', 'coturn', '5349']
+    environment:
+      REALM: turkey
+      PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@localhost/${DB_NAME:-retdb}'
+    healthcheck:
+      test: ['CMD', 'nc', '-zv', '${HUB_DOMAIN:?error}', '5349']
 
 
 volumes:
