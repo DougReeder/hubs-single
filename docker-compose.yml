@@ -228,16 +228,17 @@ services:
       test: ['CMD', 'nc', '-zv', 'nearspark', '5000']
 #      test: ['CMD', 'wget', '-qO', '-', '-S', 'nearspark:5000/thumbnail/']
 
-#  photomnemonic:
-#    container_name: photomnemonic
-#    image: ${OVERRIDE_PHOTOMNEMONIC_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/photomnemonic:${CONTAINER_TAG:-stable-latest}}
-#    restart: unless-stopped
-#    networks:
-#      - hubs
-#    ports:
-#      - '5001:5000'
-#    healthcheck:
-#      test: ['CMD', 'curl', '-f', 'http://photomnemonic:5000/_healthz']
+  photomnemonic:
+    container_name: photomnemonic
+    image: ${OVERRIDE_PHOTOMNEMONIC_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/photomnemonic:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    networks:
+      - hubs
+    ports:
+      - '5001:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://photomnemonic:5000/_healthz']
+# curl http://photomnemonic:5000/screenshot/?url=https://example.com/ > /tmp/screenshot1.png
 
 #  coturn:
 #    container_name: coturn
