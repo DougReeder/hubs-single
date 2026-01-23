@@ -2,7 +2,7 @@ name: hubs
 services:
   hubs:
     container_name: hubs
-    image: ${OVERRIDE_HUBS_IMAGE:-hubsfoundation/hubs:${CONTAINER_TAG:-stable-latest}}
+    image: ${OVERRIDE_HUBS_IMAGE:-${Container_Dockerhub_Username:-hubsfoundation}/hubs:${CONTAINER_TAG:-stable-latest}}
     restart: unless-stopped
     networks:
       - hubs
@@ -21,7 +21,7 @@ services:
 
   spoke:
     container_name: spoke
-    image: ${OVERRIDE_SPOKE_IMAGE:-hubsfoundation/spoke:${CONTAINER_TAG:-stable-latest}}
+    image: ${OVERRIDE_SPOKE_IMAGE:-${Container_Dockerhub_Username:-hubsfoundation}/spoke:${CONTAINER_TAG:-stable-latest}}
     restart: unless-stopped
     networks:
       - hubs
@@ -114,7 +114,7 @@ services:
 
   ret:
     container_name: ret
-    image: ${OVERRIDE_RETICULUM_IMAGE:-hubsfoundation/reticulum:${CONTAINER_TAG:-stable-latest}}
+    image: ${OVERRIDE_RETICULUM_IMAGE:-${Container_Dockerhub_Username:-hubsfoundation}/reticulum:${CONTAINER_TAG:-stable-latest}}
     restart: unless-stopped
     privileged: true
     depends_on:
