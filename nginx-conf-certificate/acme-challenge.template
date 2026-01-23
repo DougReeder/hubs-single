@@ -1,7 +1,7 @@
 server {
         listen 80;
         listen [::]:80;
-        server_name ${HUB_DOMAIN} support.${HUB_DOMAIN};
+        server_name $HUB_DOMAIN assets.$HUB_DOMAIN cors.$HUB_DOMAIN stream.$HUB_DOMAIN support.$HUB_DOMAIN;
 
         root /dev/null;
 

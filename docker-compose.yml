@@ -167,20 +167,15 @@ services:
     restart: unless-stopped
     volumes:
       - certbot-etc:/etc/letsencrypt:ro
-#    network_mode: host   # HCCE uses hostNetwork: true
-    networks:
-      - hubs
-    ports:
-      - '4443:4443'
-      - '127.0.0.1:7000:7000'
-      - '40000-40050:40000-40050'
-      - '40000-40050:40000-40050/udp'
+    network_mode: host   # needs to listen to many UDP ports
+    extra_hosts:
+      - host.docker.internal=host-gateway   # TODO: use this to set external-ip
     environment:
       HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/fullchain.pem
       HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?error}/privkey.pem
     healthcheck:   # Mediasoup 5 has a built-in healthcheck
       #      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
-      test: ['CMD', 'curl', '-f', 'http://dialog:7000/meta']
+      test: ['CMD', 'curl', '-f', 'http://host.docker.internal:7000/meta']
 
   nginx:
     image: nginx:1.29-alpine
@@ -194,7 +189,7 @@ services:
     ports:
       - '80:80'
       - '443:443'
-      - '4443:4443'
+#      - '4443:4443'
     volumes:
       - ./nginx-conf:/etc/nginx/conf.d
       - ./single:/var/www/single:ro
@@ -247,7 +242,7 @@ services:
     restart: unless-stopped
     volumes:
       - certbot-etc:/etc/letsencrypt:ro
-    network_mode: host   # HCCE uses hostNetwork: true
+    network_mode: host   # needs to listen to many UDP ports
 #    extra_hosts:
 #      - host.docker.internal=host-gateway   # could use this to set external-ip
     environment:
