@@ -15,11 +15,11 @@ server {
         }
 
 # https://assets.single.hominidsoftware.com/hubs/assets/stylesheets/support-63d74e7f6dde478
+# https://assets.single.hominidsoftware.com/hubs/pages/
         location /hubs {
             proxy_pass https://hubs:8080;   # TLS
 
             include /etc/nginx/conf.d/proxy-directives.inc;
-            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
             include /etc/nginx/conf.d/security.inc;
         }
 
@@ -29,7 +29,6 @@ server {
             proxy_pass https://spoke:8080;   # TLS
 
             include /etc/nginx/conf.d/proxy-directives.inc;
-            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
             include /etc/nginx/conf.d/security.inc;
         }
 
@@ -38,14 +37,12 @@ server {
             proxy_pass http://ret:4001;   # no TLS
 
             include /etc/nginx/conf.d/proxy-directives.inc;
-            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
         }
 
         location /http {
             proxy_pass http://ret:4001;   # no TLS
 
             include /etc/nginx/conf.d/proxy-directives.inc;
-            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
         }
 
 # https://cors.single.hominidsoftware.com/nearspark/thumbnail/aHR0cHM6Ly9tZWRpYS5za2V0Y2hmYWIuY29tL21vZGVscy82ZTYxNzhiMDdhNTk0Mzg1YTYwNDUyZjdjMTMxOTQ5My90aHVtYm5haWxzLzczYmQyOGI0YWZmNDQ2NDY5ZDM5ZWUwNzcxNmQ5ZGFkL2I0NzY0NTkxOWEyNzQ4YzZiODc3MWVjNDRlMjU2YWUwLmpwZWc.jpeg?w=391&h=220
