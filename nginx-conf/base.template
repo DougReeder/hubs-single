@@ -47,7 +47,6 @@ server {
             proxy_pass http://ret:4001;   # no TLS
 
             include /etc/nginx/conf.d/proxy-directives.inc;
-            add_header Access-Control-Allow-Origin "$HUB_DOMAIN";
 #             include /etc/nginx/conf.d/security.inc;
         }
 
