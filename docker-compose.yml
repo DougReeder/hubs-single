@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
     networks:
       - hubs
-    ports:
+    ports:   # only for coturn
       - '127.0.0.1:5432:5432'   # pgbouncer on hubs network; 127.0.0.1 on host
       - '[::1]:5432:5432'
 ##      - '127.0.0.1:6432:6432'   # development only
@@ -163,23 +163,6 @@ services:
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
 
-  dialog:
-    container_name: dialog
-    image: ${OVERRIDE_DIALOG_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/dialog:${CONTAINER_TAG:-stable-latest}}
-    restart: unless-stopped
-    volumes:
-      - certbot-etc:/etc/letsencrypt:ro
-    network_mode: host   # needs to listen to many UDP ports
-    extra_hosts:
-      - host.docker.internal=host-gateway
-    environment:
-      perms_key: ${PERMS_KEY:?generated private key}
-      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/fullchain.pem
-      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/privkey.pem
-    healthcheck:   # Mediasoup 5 has a built-in healthcheck
-      #      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
-      test: ['CMD', 'curl', '-f', 'http://host.docker.internal:7000/meta']
-
   router:
     image: nginx:1.29-alpine
     container_name: router
@@ -188,7 +171,7 @@ services:
       hubs: { condition: service_healthy }
       spoke: { condition: service_healthy, required: false }
       ret: { condition: service_healthy }
-      dialog: { condition: service_healthy, required: false }
+#      dialog: { condition: service_healthy, required: false }
     networks:
       - hubs
     ports:
@@ -217,6 +200,46 @@ services:
       retries: 3
       start_period: 10s
 
+  coturn:
+    container_name: coturn
+    image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    depends_on:
+      pgbouncer: { condition: service_healthy }
+    volumes:
+      - certbot-etc:/etc/letsencrypt:ro
+    network_mode: host   # needs to listen to many UDP ports
+    extra_hosts:
+      - host.docker.internal=host-gateway   # could use this to set external-ip
+    environment:
+      REALM: turkey
+      PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@localhost/${DB_NAME:-retdb}'
+      COTURN_MIN_PORT: ${COTURN_MIN_PORT:-49152}
+      COTURN_MAX_PORT: ${COTURN_MAX_PORT:-51609}
+      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/fullchain.pem
+      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/privkey.pem
+    healthcheck:
+      test: ['CMD', 'nc', '-zv', '${HUB_DOMAIN:?host name}', '5349']
+
+  dialog:
+    container_name: dialog
+    image: ${OVERRIDE_DIALOG_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/dialog:${CONTAINER_TAG:-stable-latest}}
+    restart: unless-stopped
+    depends_on:
+      coturn: { condition: service_healthy }
+    volumes:
+      - certbot-etc:/etc/letsencrypt:ro
+    network_mode: host   # needs to listen to many UDP ports
+    extra_hosts:
+      - host.docker.internal=host-gateway
+    environment:
+      perms_key: ${PERMS_KEY:?generated private key}
+      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/fullchain.pem
+      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/privkey.pem
+    healthcheck:   # Mediasoup 5 has a built-in healthcheck
+      #      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
+      test: ['CMD', 'curl', '-f', 'http://host.docker.internal:7000/meta']
+
   nearspark:
     container_name: nearspark
     image: ${OVERRIDE_NEARSPARK_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/nearspark:${CONTAINER_TAG:-stable-latest}}
@@ -225,6 +248,8 @@ services:
       - hubs
     ports:
       - '5000:5000'
+    extra_hosts:
+      - host.docker.internal=host-gateway
     healthcheck:
       test: ['CMD', 'nc', '-zv', 'nearspark', '5000']
 #      test: ['CMD', 'wget', '-qO', '-', '-S', 'nearspark:5000/thumbnail/']
@@ -236,29 +261,10 @@ services:
     networks:
       - hubs
     ports:
-      - '5001:5000'
+      - '5001:5000'   # development only
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://photomnemonic:5000/_healthz']
 # curl http://photomnemonic:5000/screenshot/?url=https://example.com/ > /tmp/screenshot1.png
-
-  coturn:
-    container_name: coturn
-    image: ${OVERRIDE_COTURN_IMAGE:-${Container_Dockerhub_Username:-mozillareality}/coturn:${CONTAINER_TAG:-stable-latest}}
-    restart: unless-stopped
-    volumes:
-      - certbot-etc:/etc/letsencrypt:ro
-    network_mode: host   # needs to listen to many UDP ports
-#    extra_hosts:
-#      - host.docker.internal=host-gateway   # could use this to set external-ip
-    environment:
-      REALM: turkey
-      PSQL: 'postgres://${DB_USER:-postgres}:${DB_PASS:-123456}@localhost/${DB_NAME:-retdb}'
-      COTURN_MIN_PORT: ${COTURN_MIN_PORT:-49152}
-      COTURN_MAX_PORT: ${COTURN_MAX_PORT:-51609}
-      HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/fullchain.pem
-      HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/privkey.pem
-    healthcheck:
-      test: ['CMD', 'nc', '-zv', '${HUB_DOMAIN:?host name}', '5349']
 
 
 volumes:

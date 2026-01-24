@@ -25,6 +25,14 @@ server {
             include /etc/nginx/conf.d/proxy-directives.inc;
         }
 
+        location /socket/ {
+            proxy_pass http://ret:4001;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+#             proxy_read_timeout 60s;
+        }
+
 # https://single.hominidsoftware.com/api/v1/meta
 # https://single.hominidsoftware.com/spoke
 
