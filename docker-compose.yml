@@ -130,6 +130,8 @@ services:
       - '4000:4000'   # HTTPS (development only)
       - '4001:4001'   # HTTP (development only)
       - '127.0.0.1:9100:9100'
+    extra_hosts:
+      - host.docker.internal=host-gateway
     volumes:
       - reticulum-storage:/storage
       - ./reticulum-config:/home/ret
@@ -160,6 +162,12 @@ services:
       turkeyCfg_PHOTOMNEMONIC: http://photomnemonic:5000
       turkeyCfg_SPEELYCAPTOR: http://speelycaptor:5000
       turkeyCfg_STORAGE_QUOTA_GB: 1000
+      HUBS_ADMIN_INTERNAL_HOSTNAME: hubs
+      HUBS_CLIENT_INTERNAL_HOSTNAME: hubs
+      SPOKE_INTERNAL_HOSTNAME: spoke
+      POSTGREST_INTERNAL_HOSTNAME: postgrest
+      DIALOG_HOSTNAME: host.docker.internal
+      DIALOG_PORT: 4443
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
 
@@ -194,7 +202,7 @@ services:
         envsubst '$$HUB_DOMAIN' < $$file > $${file%.template}.conf;
       done && exec nginx -g 'daemon off;'"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://host.docker.internal/healthz']
+      test: ['CMD', 'curl', '-f', 'http://router/healthz']
       interval: 15s
       timeout: 10s
       retries: 3
