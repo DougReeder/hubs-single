@@ -76,6 +76,9 @@ services:
       DB_HOST: pgsql
     healthcheck: &pgbouncer-healthcheck
       test: ['CMD', 'psql', '-h', 'localhost', '-U', '${DB_USER:-postgres}', '-c', 'SELECT 1']
+      interval: 10m
+      start_period: 1m
+      start_interval: 30s
 
   pgbouncer-t:
     container_name: pgbouncer-t
@@ -170,6 +173,9 @@ services:
       DIALOG_PORT: 4443
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
+      interval: 10m
+      start_period: 1m
+      start_interval: 30s
 
   router:
     image: nginx:1.29-alpine
