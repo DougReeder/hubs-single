@@ -169,7 +169,7 @@ services:
       HUBS_CLIENT_INTERNAL_HOSTNAME: hubs
       SPOKE_INTERNAL_HOSTNAME: spoke
       POSTGREST_INTERNAL_HOSTNAME: postgrest
-      DIALOG_HOSTNAME: host.docker.internal
+      DIALOG_HOSTNAME: stream.${HUB_DOMAIN}
       DIALOG_PORT: 4443
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
