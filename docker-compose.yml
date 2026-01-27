@@ -16,6 +16,7 @@ services:
       turkeyCfg_cors_proxy_server: cors.${HUB_DOMAIN:?host name}
       turkeyCfg_shortlink_domain: ${HUB_DOMAIN:?host name}
       turkeyCfg_tier: p1
+      INTERNAL_HOSTNAME: hubs
     healthcheck:
       test: ['CMD', 'curl', '-fk', 'https://hubs:8080/healthz']
 
@@ -36,6 +37,7 @@ services:
       turkeyCfg_cors_proxy_server: cors.${HUB_DOMAIN:?host name}
       turkeyCfg_shortlink_domain: ${HUB_DOMAIN:?host name}
       turkeyCfg_hubs_server: ${HUB_DOMAIN:?host name}
+      INTERNAL_HOSTNAME: spoke
     healthcheck:
       test: ['CMD', 'curl', '-fk', 'https://spoke:8080/healthz']
 
@@ -170,7 +172,7 @@ services:
       SPOKE_INTERNAL_HOSTNAME: spoke
       POSTGREST_INTERNAL_HOSTNAME: postgrest
       DIALOG_HOSTNAME: stream.${HUB_DOMAIN}
-      DIALOG_PORT: 4443
+      DIALOG_PORT: ${DIALOG_PORT:-4443}
     healthcheck:
       test: ['CMD', 'wget', '-qO', '-', '-S', 'ret:4001/health']
       interval: 10m
@@ -250,6 +252,7 @@ services:
       perms_key: ${PERMS_KEY:?generated private key}
       HTTPS_CERT_FULLCHAIN: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/fullchain.pem
       HTTPS_CERT_PRIVKEY: /etc/letsencrypt/live/${HUB_DOMAIN:?host name}/privkey.pem
+      PROTOO_LISTEN_PORT: ${DIALOG_PORT:-4443}
     healthcheck:   # Mediasoup 5 has a built-in healthcheck
       #      test: ['CMD', 'curl', '-fk', 'https://dialog:4443/']
       test: ['CMD', 'curl', '-f', 'http://host.docker.internal:7000/meta']
