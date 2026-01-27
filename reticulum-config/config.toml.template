@@ -78,11 +78,11 @@ ip = "127.0.0.1"
 http_port = 9631
 
 [ret."Elixir.Ret.JanusLoadStatus"]
-default_janus_host = "stream.<DOMAIN>"
+default_janus_host = "<DIALOG_HOSTNAME>"
 janus_service_name = ""
 janus_admin_secret = ""
 janus_admin_port = 7000
-janus_port = 4443
+janus_port = <DIALOG_PORT>
 
 [ret."Elixir.Ret.Guardian"]
 secret_key = "<GUARDIAN_KEY>"
