@@ -78,7 +78,7 @@ ip = "127.0.0.1"
 http_port = 9631
 
 [ret."Elixir.Ret.JanusLoadStatus"]
-default_janus_host = "stream.<DOMAIN>"
+default_janus_host = "host.docker.internal"
 janus_service_name = ""
 janus_admin_secret = ""
 janus_admin_port = 7000
