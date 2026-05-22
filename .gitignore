@@ -2,6 +2,8 @@
 
 # site-specific
 .env
+cloud-config.yaml
+sync.sh
 
 # dependencies
 /node_modules
